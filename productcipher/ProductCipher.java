@@ -11,6 +11,45 @@ public class ProductCipher {
     // input scanner
     static Scanner input = new Scanner(System.in);
 
+    private static String secondTurnEncryption(String cipher, int[] key) {
+        
+        char[][] table = new char[tableRow][tableCol];
+        int k=0;
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                table[i][j] = cipher.charAt(k);
+                k++;
+            }
+        }
+        // shuffle the columns according to the key.
+        char[][] shuffledTable = new char[tableRow][tableCol];
+        for(int i=0; i<4; i++){
+            int col = key[i]-1;
+            for(int j=0; j<tableRow; j++){
+                shuffledTable[j][i] = table[j][col];
+            }
+        }
+
+        // print shuffled table. 
+        System.out.println("Shuffled Table After 2nd Turn: \n\n");
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                System.out.print(shuffledTable[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // print cipher text from Shuffled table Column by Column.
+        String secondCipher = "";
+        for(int i=0; i<tableCol; i++){
+            for(int j=0; j<tableRow; j++){
+                secondCipher += shuffledTable[j][i];
+            }
+        }
+        
+        return secondCipher;
+    }
+
     static void encrypt(String plainTxt){
         // Affine Cipher encryption: 
         plainTxt = plainTxt.toUpperCase();
@@ -19,7 +58,7 @@ public class ProductCipher {
         for (int i = 0; i < plainTxt.length(); i++) {
             affineCipher = affineCipher + (char) ((((a * (plainTxt.charAt(i) - 'A')) + b) % 26) + 'A');
         }
-        System.out.println("Affine Cipher Text: " + affineCipher);
+        System.out.println("Affine Cipher Text: " + affineCipher + "\n\n");
 
         System.out.println("Applying Columnar Transposition Cipher.......\n\n");
         // Columnar Transposition Cipher encryption:
@@ -85,8 +124,49 @@ public class ProductCipher {
         }
 
         System.out.println("Cipher Text: " + cipher);
+        String finalCipher = secondTurnEncryption(cipher, key);
+        System.out.println("Cipher Text after 2nd Round of Columnar (Final Cipher):  " + finalCipher);
         
+    }
 
+
+    private static String secondTurnDecryption(String midCipher, int[] key) {
+        // read the cipher text column by column.
+        char[][] table = new char[tableRow][tableCol];
+        int k=0;
+        for(int i=0; i<tableCol; i++){
+            for(int j=0; j<tableRow; j++){
+                table[j][i] = midCipher.charAt(k);
+                k++;
+            }
+        }
+
+        // shuffle the table following the key.
+        char[][] shuffledTable = new char[tableRow][tableCol];
+        for(int i=0; i<4; i++){
+            int col = key[i]-1;
+            for(int j=0; j<tableRow; j++){
+                shuffledTable[j][col] = table[j][i];
+            }
+        }
+
+        // print shuffled table.
+        System.out.println("Shuffled Table after 2nd Round: ");
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                System.out.print(shuffledTable[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // print plain text from shuffled table row by row.
+        String plainTxt = "";
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                plainTxt += shuffledTable[i][j];
+            }
+        }
+        return plainTxt;
     }
 
     static void decrypt(String cipher){
@@ -139,6 +219,8 @@ public class ProductCipher {
                 plainTxt += shuffledTable[i][j];
             }
         }
+        plainTxt = secondTurnDecryption(plainTxt, key);
+
 
         // remove the padding.
         int padding = 0;
@@ -150,7 +232,7 @@ public class ProductCipher {
         }
         plainTxt = plainTxt.substring(0, plainTxt.length()-padding);
 
-        System.out.println("Columnar Decrypted Text: " + plainTxt);
+        System.out.println("Columnar Decrypted Text: " + plainTxt + "\n\n");
         String affineCipher = plainTxt;
 
         // Affine Cipher decryption:
@@ -172,7 +254,7 @@ public class ProductCipher {
         for (int i = 0; i < affineCipher.length(); i++)
             msg = msg + (char) (((a_inv * ((affineCipher.charAt(i) + 'A' - b)) % 26)) + 'A');
 
-        System.out.println("Final Plain Text: " + msg);
+        System.out.println("Final Plain Text: " + msg + "\n\n");
 
     }
 
