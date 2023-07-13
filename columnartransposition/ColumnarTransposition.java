@@ -14,7 +14,7 @@ public class ColumnarTransposition {
         for(int i=0; i<4; i++){
             key[i] = input.nextInt();
         }
-        
+
         plainTxt = plainTxt.toUpperCase();
         tableRow = plainTxt.length()/tableCol;
         if(plainTxt.length() % tableCol != 0)
@@ -35,15 +35,7 @@ public class ColumnarTransposition {
                 k++;
             }
         }
-        //print the table
-        System.out.println("Table: ");
-        for(int i=0; i<tableRow; i++){
-            for(int j=0; j<tableCol; j++){
-                System.out.print(table[i][j] + " ");
-            }
-            System.out.println();
-        }
-
+        
         // shuffle the columns according to the key.
         char[][] shuffledTable = new char[tableRow][tableCol];
         for(int i=0; i<4; i++){
@@ -54,14 +46,13 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table. 
-        System.out.println("Shuffled Table: ");
+        System.out.println("Shuffled Table After 1st Round: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
             }
             System.out.println();
         }
-
 
         // print cipher text from Shuffled table Column by Column.
         String cipher = "";
@@ -71,7 +62,50 @@ public class ColumnarTransposition {
             }
         }
 
-        System.out.println("Cipher Text: " + cipher);
+        System.out.println("Cipher Text after 1st Round: " + cipher);
+
+        String finalCipher = secondTurnEncryption(cipher, key);
+        System.out.println("Cipher Text after 2nd Round: " + finalCipher);
+
+    }
+
+    private static String secondTurnEncryption(String cipher, int[] key) {
+        
+        char[][] table = new char[tableRow][tableCol];
+        int k=0;
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                table[i][j] = cipher.charAt(k);
+                k++;
+            }
+        }
+        // shuffle the columns according to the key.
+        char[][] shuffledTable = new char[tableRow][tableCol];
+        for(int i=0; i<4; i++){
+            int col = key[i]-1;
+            for(int j=0; j<tableRow; j++){
+                shuffledTable[j][i] = table[j][col];
+            }
+        }
+
+        // print shuffled table. 
+        System.out.println("Shuffled Table After 2nd Turn: ");
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                System.out.print(shuffledTable[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // print cipher text from Shuffled table Column by Column.
+        String secondCipher = "";
+        for(int i=0; i<tableCol; i++){
+            for(int j=0; j<tableRow; j++){
+                secondCipher += shuffledTable[j][i];
+            }
+        }
+        
+        return secondCipher;
     }
 
     static void decrypt(String cipher){
@@ -104,7 +138,7 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table.
-        System.out.println("Shuffled Table: ");
+        System.out.println("Shuffled Table after 1st Round: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
@@ -120,6 +154,8 @@ public class ColumnarTransposition {
             }
         }
 
+        plainTxt = secondTurnDecryption(plainTxt, key);
+
         // remove the padding.
         int padding = 0;
         for(int i=plainTxt.length()-1; i>=0; i--){
@@ -131,6 +167,45 @@ public class ColumnarTransposition {
         plainTxt = plainTxt.substring(0, plainTxt.length()-padding);
 
         System.out.println("Plain Text: " + plainTxt);
+    }
+
+    private static String secondTurnDecryption(String midCipher, int[] key) {
+        // read the cipher text column by column.
+        char[][] table = new char[tableRow][tableCol];
+        int k=0;
+        for(int i=0; i<tableCol; i++){
+            for(int j=0; j<tableRow; j++){
+                table[j][i] = midCipher.charAt(k);
+                k++;
+            }
+        }
+
+        // shuffle the table following the key.
+        char[][] shuffledTable = new char[tableRow][tableCol];
+        for(int i=0; i<4; i++){
+            int col = key[i]-1;
+            for(int j=0; j<tableRow; j++){
+                shuffledTable[j][col] = table[j][i];
+            }
+        }
+
+        // print shuffled table.
+        System.out.println("Shuffled Table after 2nd Round: ");
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                System.out.print(shuffledTable[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // print plain text from shuffled table row by row.
+        String plainTxt = "";
+        for(int i=0; i<tableRow; i++){
+            for(int j=0; j<tableCol; j++){
+                plainTxt += shuffledTable[i][j];
+            }
+        }
+        return plainTxt;
     }
 
     private static void operationChoice(String text) {

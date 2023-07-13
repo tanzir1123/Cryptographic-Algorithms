@@ -5,17 +5,16 @@ import java.util.Scanner;
 class Affine {
     static Scanner input = new Scanner(System.in);
 
-    // Key values of a and b
+    // Affine Key values
     static int a = 17;
     static int b = 20;
 
     static void encrypt(String plainTxt) {
-        /// Cipher Text initially empty
-        
+     
         plainTxt = plainTxt.toUpperCase();
         String cipher = "";
         for (int i = 0; i < plainTxt.length(); i++) {
-            // Avoid space to be encrypted
+            
             /* applying encryption formula ( a x + b ) mod m
             {here x is msg[i] and m is 26} and added 'A' to
             bring it in range of ascii alphabet[ 65-90 | A-Z ] */
@@ -39,7 +38,6 @@ class Affine {
         // in the group of integers modulo m.)
         for (int i = 0; i < 26; i++) {
             flag = (a * i) % 26;
-
             // Check if (a*i)%26 == 1,
             // then i will be the multiplicative inverse of a
             if (flag == 1) {
@@ -73,7 +71,7 @@ class Affine {
             System.out.println("Try again. Press 1 or 2.");
         }
     }
-    // Driver code
+
     public static void main(String[] args) {
         System.out.println("--------------Affine Cipher--------------");
         
