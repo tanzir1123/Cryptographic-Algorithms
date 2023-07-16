@@ -87,7 +87,7 @@ class AffineAllTestCases {
         String yellow = "\u001B[33m";
     
         // Print the table header with colors
-        System.out.print(cyan + "Input Size (N)\t\t" + yellow + "Encryption Time\t\t" + yellow + "Decryption Time" + reset);
+        System.out.print(cyan + "Input Size (N)\t\t" + yellow + "Encryption Time (us)\t" + yellow + "Decryption Time (us)" + reset);
         System.out.println();
     
         // Print the table rows with colors

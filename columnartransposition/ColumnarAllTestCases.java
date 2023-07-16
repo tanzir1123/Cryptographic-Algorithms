@@ -1,19 +1,26 @@
 package columnartransposition;
+import java.util.List;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
-public class ColumnarTransposition {
+public class ColumnarAllTestCases {
     // input scanner
     static Scanner input = new Scanner(System.in);
     static int tableCol = 4;
     static int tableRow;
 
-    static void encrypt(String plainTxt){
+    static String encrypt(String plainTxt){
         
-        int[] key = new int[4];
-        System.out.println("Enter 4 digit key with spaces: ");
-        for(int i=0; i<4; i++){
-            key[i] = input.nextInt();
-        }
+        int[] key = {2, 1, 3, 4};
+        // System.out.println("Enter 4 digit key with spaces: ");
+        // for(int i=0; i<4; i++){
+        //     key[i] = input.nextInt();
+        // }
 
         plainTxt = plainTxt.toUpperCase();
         tableRow = plainTxt.length()/tableCol;
@@ -46,12 +53,12 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table. 
-        System.out.println("Shuffled Table After 1st Round: ");
+        //System.out.println("Shuffled Table After 1st Round: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
             }
-            System.out.println();
+            //System.out.println();
         }
 
         // print cipher text from Shuffled table Column by Column.
@@ -62,10 +69,11 @@ public class ColumnarTransposition {
             }
         }
 
-        System.out.println("Cipher Text after 1st Round: " + cipher);
+        //System.out.println("Cipher Text after 1st Round: " + cipher);
 
         String finalCipher = secondTurnEncryption(cipher, key);
-        System.out.println("Cipher Text after 2nd Round: " + finalCipher);
+        //System.out.println("Cipher Text after 2nd Round: " + finalCipher);
+        return finalCipher;
 
     }
 
@@ -89,12 +97,12 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table. 
-        System.out.println("Shuffled Table After 2nd Turn: ");
+        //System.out.println("Shuffled Table After 2nd Turn: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
             }
-            System.out.println();
+            //System.out.println();
         }
 
         // print cipher text from Shuffled table Column by Column.
@@ -109,11 +117,12 @@ public class ColumnarTransposition {
     }
 
     static void decrypt(String cipher){
-        int[] key = new int[4];
-        System.out.println("Enter 4 digit key with spaces: ");
-        for(int i=0; i<4; i++){
-            key[i] = input.nextInt();
-        }
+        int[] key = {2, 1, 3, 4};
+        // int[] key = new int[4];
+        // System.out.println("Enter 4 digit key with spaces: ");
+        // for(int i=0; i<4; i++){
+        //     key[i] = input.nextInt();
+        // }
 
         cipher = cipher.toUpperCase();
         tableRow = cipher.length()/tableCol;
@@ -138,12 +147,12 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table.
-        System.out.println("Shuffled Table after 1st Round: ");
+        //System.out.println("Shuffled Table after 1st Round: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
             }
-            System.out.println();
+            //System.out.println();
         }
 
         // print plain text from shuffled table row by row.
@@ -166,7 +175,7 @@ public class ColumnarTransposition {
         }
         plainTxt = plainTxt.substring(0, plainTxt.length()-padding);
 
-        System.out.println("Plain Text: " + plainTxt);
+        //System.out.println("Plain Text: " + plainTxt);
     }
 
     private static String secondTurnDecryption(String midCipher, int[] key) {
@@ -190,12 +199,12 @@ public class ColumnarTransposition {
         }
 
         // print shuffled table.
-        System.out.println("Shuffled Table after 2nd Round: ");
+        //System.out.println("Shuffled Table after 2nd Round: ");
         for(int i=0; i<tableRow; i++){
             for(int j=0; j<tableCol; j++){
                 System.out.print(shuffledTable[i][j] + " ");
             }
-            System.out.println();
+            //System.out.println();
         }
 
         // print plain text from shuffled table row by row.
@@ -208,33 +217,85 @@ public class ColumnarTransposition {
         return plainTxt;
     }
 
-    private static void operationChoice(String text) {
-        System.out.println("Press 1: Encrypt");
-        System.out.println("Press 2: Decrypt");
-        short sc = input.nextShort();
+    static void printTable(List<Integer> inputSizes, List<Long> encryptionTimes, List<Long> decryptionTimes) {
+        // ANSI escape codes for colors
+        String reset = "\u001B[0m";
+        String cyan = "\u001B[36m";
+        String yellow = "\u001B[33m";
+    
+        // Print the table header with colors
+        System.out.print(cyan + "Input Size (N)\t\t" + yellow + "Encryption Time (us)\t" + yellow + "Decryption Time (us)" + reset);
+        System.out.println();
+    
+        // Print the table rows with colors
+        for (int i = 0; i < inputSizes.size(); i++) {
+            int inputSize = inputSizes.get(i);
+            long encryptionTime = encryptionTimes.get(i);
+            long decryptionTime = decryptionTimes.get(i);
+            System.out.printf("%-25d %-25d %-20d%n", inputSize, encryptionTime, decryptionTime);
+        }
+    }
+    static List<String> readInputCases(String filePath) {
+        List<String> inputCases = new ArrayList<>();
         
-        // avoid spaces
-        String newText = "";
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) != ' ') {
-                newText += text.charAt(i);
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                inputCases.add(line);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        text = newText;
+        
+        return inputCases;
+    }
 
-        if (sc == 1) {
-            encrypt(text);
-        } else if (sc == 2) {
-            decrypt(text);
-        } else {
-            System.out.println("Try again. Press 1 or 2.");
+    static void runAllTestCases(){
+        // Read input cases from input.txt
+        List<String> plaininputCases = readInputCases("columnartransposition\\plainTextInput.txt");
+
+        long startTime, endTime, elapsedTime;
+        ArrayList<Integer> inputSizes = new ArrayList<Integer>();
+        ArrayList<Long> encryptionTimes = new ArrayList<Long>();
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("columnartransposition\\cipherTextInput.txt"))) {
+            for (String inputCase : plaininputCases) {
+                startTime = System.nanoTime();
+                System.out.println("TC Input: " + inputCase + "\n");
+                String ciphertext = encrypt(inputCase);
+                writer.write(ciphertext);
+                writer.newLine();
+
+                inputSizes.add(inputCase.length());
+                endTime = System.nanoTime();
+                elapsedTime = endTime - startTime;
+                encryptionTimes.add(elapsedTime / 1000); // Convert nanoseconds to microseconds
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        List<String> cipherinputCases = readInputCases("columnartransposition\\cipherTextInput.txt");
+        
+        ArrayList<Long> decryptionTimes = new ArrayList<Long>();
+
+        for (String inputCase : cipherinputCases) {
+            startTime = System.nanoTime();
+            System.out.println("TC Input: " + inputCase + "\n");
+            decrypt(inputCase);
+            endTime = System.nanoTime();
+            elapsedTime = endTime - startTime;
+            decryptionTimes.add(elapsedTime/ 1000);
+        }
+
+        System.out.println("--------------Columnar Transposition Cipher ALL TEST CASES--------------\n\n");
+        printTable(inputSizes, encryptionTimes, decryptionTimes);
+
     }
     public static void main(String[] args) {
         System.out.println("--------------Columnar Transposition Cipher--------------");
-        System.out.println("Enter the text: ");
-        String text = input.nextLine();
-        
-        operationChoice(text);
+        System.out.println("Running test cases... \n");
+
+        runAllTestCases();
     }
 }
